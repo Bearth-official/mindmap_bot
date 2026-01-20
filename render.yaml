@@ -1,0 +1,12 @@
+# Render Blueprint 配置檔
+# 這個檔案定義了如何在 Render 上部署你的 Discord Bot
+
+services:
+  - type: worker
+    name: bearth-discord-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bearth_bot.py
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false  # 需要在 Render Dashboard 手動設定
