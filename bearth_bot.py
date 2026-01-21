@@ -21,7 +21,7 @@ BUTTON_LABELS = {
         "physical": "Physical",
         "hybrid": "Hybrid",
         "lang_switch": "中文",
-        "lang_emoji": "🇹🇼",
+        "lang_emoji": "\U0001F004",  # 🀄 麻將紅中
     },
     "zh": {
         "vision_value": "願景與價值",
@@ -31,14 +31,41 @@ BUTTON_LABELS = {
         "physical": "實體",
         "hybrid": "混合",
         "lang_switch": "English",
-        "lang_emoji": "🇺🇸",
+        "lang_emoji": "\U0001F1FA\U0001F1F8",  # �🇸 美國國旗
     }
 }
+
+# 公共訊息 Embed 內容
+def get_public_embed(lang: str = "en") -> discord.Embed:
+    """根據語言返回公共訊息 Embed"""
+    if lang == "en":
+        embed = discord.Embed(
+            title="\U0001F5FA\uFE0F MINDMAP",
+            description="Bearth is an original IP, a universe born from a story of loss and rebirth. We are building a transmedia world that grows and evolves with its community.\n\nThis mindmap is our living blueprint, not a rigid roadmap. It's about creating a home among the stars, one thoughtful step at a time.",
+            color=0x5865F2  # Discord 藍色
+        )
+        embed.add_field(
+            name="\U0001F4D6 How to use",
+            value="Click the **Read** button below to open your personal navigation panel. Only you can see it!",
+            inline=False
+        )
+    else:
+        embed = discord.Embed(
+            title="\U0001F5FA\uFE0F 思維導圖",
+            description="Bearth 是一個原創 IP，一個從失去與重生的故事中誕生的宇宙。我們正在建立一個與社群共同成長和演化的跨媒體世界。\n\n這個思維導圖是我們的活藍圖，而非僵化的路線圖。這是關於在星空中創造一個家園，一步一個腳印，用心前行。",
+            color=0x5865F2
+        )
+        embed.add_field(
+            name="\U0001F4D6 使用說明",
+            value="點擊下方的**閱讀**按鈕開啟您的個人導覽面板，只有您自己看得到！",
+            inline=False
+        )
+    return embed
 
 # 多語言內容資料
 CONTENT = {
     "en": {
-        "header": "**🐻 Bearth Info Center**\nClick the buttons below to explore our universe:",
+        "header": "🐻 **Bearth Info Center**\nClick the buttons below to explore:",
         "vision_value": {
             "title": "✨ Vision & Value",
             "fields": [
@@ -161,6 +188,49 @@ CONTENT = {
     }
 }
 
+# 伺服器規則內容
+RULES_CONTENT = {
+    "en": {
+        "title": "📜 SERVER RULES",
+        "description": "Welcome to the community! To maintain a safe and fun environment, please adhere to the following rules.",
+        "rules": [
+            ("1️⃣ Be Respectful", "Treat everyone with courtesy. No hate speech, harassment, insults, or toxic behavior will be tolerated."),
+            ("2️⃣ No NSFW or Illegal Content", "Keep it clean. No explicit (NSFW), violent, illegal content, or pirated material."),
+            ("3️⃣ No Spam or Self-Promotion", "Do not flood the chat. Unauthorized advertising, invite links, and DM spam are strictly prohibited."),
+            ("4️⃣ Keep Channels On-Topic", "Please use the appropriate channels for your discussions. Check channel descriptions before posting."),
+            ("5️⃣ Protect Privacy & Safety", "No doxxing. Never share your private keys, passwords, or personal info. Staff will NEVER ask for your password."),
+            ("6️⃣ Follow Discord ToS", "You must abide by Discord's Terms of Service and Community Guidelines."),
+            ("7️⃣ Respect Moderation", "Moderators have the final say. If you have issues, please open a ticket or DM a mod politely."),
+        ]
+    },
+    "zh": {
+        "title": "📜 伺服器規則",
+        "description": "歡迎來到我們的社群！為了維護安全且有趣的環境，請務必遵守以下規範。",
+        "rules": [
+            ("1️⃣ 保持尊重與友善", "請禮貌待人。嚴禁仇恨言論、騷擾、侮辱或任何惡意攻擊行為。"),
+            ("2️⃣ 禁止不當與非法內容", "請保持版面乾淨。嚴禁色情、暴力、非法活動或盜版內容。"),
+            ("3️⃣ 禁止洗版與未經許可的廣告", "請勿重複發送訊息刷頻。嚴禁未經許可的廣告宣傳、邀請連結或私訊騷擾。"),
+            ("4️⃣ 遵守頻道分類", "請在正確的頻道討論相關話題。發言前請先閱讀頻道說明。"),
+            ("5️⃣ 保護隱私與安全", "禁止肉搜他人。請勿公開您的私鑰、密碼或個人資料。管理員絕不會向您索取密碼。"),
+            ("6️⃣ 遵守 Discord 官方條款", "所有成員必須遵守 Discord 的服務條款與社群準則。"),
+            ("7️⃣ 尊重管理員權限", "管理員擁有最終決定權。若有疑問，請透過工單 (Ticket) 或私訊冷靜溝通。"),
+        ]
+    }
+}
+
+
+def get_rules_embed(lang: str = "en") -> discord.Embed:
+    """根據語言返回伺服器規則 Embed"""
+    content = RULES_CONTENT[lang]
+    embed = discord.Embed(
+        title=content["title"],
+        description=content["description"],
+        color=0xED4245  # 紅色，表示重要規則
+    )
+    for name, value in content["rules"]:
+        embed.add_field(name=name, value=value, inline=False)
+    return embed
+
 
 def get_embed_content(embed_type: str, lang: str = "en") -> discord.Embed:
     """根據類型和語言返回對應的 Embed"""
@@ -173,26 +243,23 @@ def get_embed_content(embed_type: str, lang: str = "en") -> discord.Embed:
     return embed
 
 
-# 定義按鈕視圖（使用動態按鈕）
-class NavigationView(discord.ui.View):
+# 私人訊息按鈕視圖（編輯同一則訊息）
+class PrivateNavigationView(discord.ui.View):
     def __init__(self, lang: str = "en"):
         super().__init__(timeout=None)
         self.lang = lang
         self._build_buttons()
     
     def _build_buttons(self):
-        """根據語言建立按鈕"""
-        # 清除所有現有按鈕
+        """根據語言建立按鈕（全部藍色）"""
         self.clear_items()
-        
         labels = BUTTON_LABELS[self.lang]
         
-        # 第一排按鈕
+        # 第一排按鈕（全部藍色 primary）
         btn_vision = discord.ui.Button(
             label=labels["vision_value"], 
             style=discord.ButtonStyle.primary, 
-            emoji="✨", 
-            custom_id="btn_vision_value", 
+            emoji="\u2728",  # ✨
             row=0
         )
         btn_vision.callback = self.vision_value_callback
@@ -200,9 +267,8 @@ class NavigationView(discord.ui.View):
         
         btn_community = discord.ui.Button(
             label=labels["community"], 
-            style=discord.ButtonStyle.success, 
-            emoji="🤝", 
-            custom_id="btn_community", 
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F91D",  # 🤝
             row=0
         )
         btn_community.callback = self.community_callback
@@ -210,20 +276,18 @@ class NavigationView(discord.ui.View):
         
         btn_expansion = discord.ui.Button(
             label=labels["expansion"], 
-            style=discord.ButtonStyle.secondary, 
-            emoji="📈", 
-            custom_id="btn_expansion", 
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F4C8",  # 📈
             row=0
         )
         btn_expansion.callback = self.expansion_callback
         self.add_item(btn_expansion)
         
-        # 第二排按鈕
+        # 第二排按鈕（全部藍色 primary）
         btn_digital = discord.ui.Button(
             label=labels["digital"], 
-            style=discord.ButtonStyle.success, 
-            emoji="💻", 
-            custom_id="btn_digital", 
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F4BB",  # 💻
             row=1
         )
         btn_digital.callback = self.digital_callback
@@ -231,9 +295,8 @@ class NavigationView(discord.ui.View):
         
         btn_physical = discord.ui.Button(
             label=labels["physical"], 
-            style=discord.ButtonStyle.secondary, 
-            emoji="🧸", 
-            custom_id="btn_physical", 
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F9F8",  # 🧸
             row=1
         )
         btn_physical.callback = self.physical_callback
@@ -241,20 +304,18 @@ class NavigationView(discord.ui.View):
         
         btn_hybrid = discord.ui.Button(
             label=labels["hybrid"], 
-            style=discord.ButtonStyle.danger, 
-            emoji="🔗", 
-            custom_id="btn_hybrid", 
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F517",  # 🔗
             row=1
         )
         btn_hybrid.callback = self.hybrid_callback
         self.add_item(btn_hybrid)
         
-        # 第三排：語言切換按鈕
+        # 第三排：語言切換按鈕（藍色）
         btn_lang = discord.ui.Button(
             label=labels["lang_switch"], 
-            style=discord.ButtonStyle.secondary, 
-            emoji=labels["lang_emoji"], 
-            custom_id="btn_lang", 
+            style=discord.ButtonStyle.primary, 
+            emoji=labels["lang_emoji"],
             row=2
         )
         btn_lang.callback = self.lang_callback
@@ -262,53 +323,149 @@ class NavigationView(discord.ui.View):
     
     async def vision_value_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("vision_value", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def community_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("community", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def expansion_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("expansion", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def digital_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("digital", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def physical_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("physical", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
     
     async def hybrid_callback(self, interaction: discord.Interaction):
         embed = get_embed_content("hybrid", self.lang)
-        await interaction.response.edit_message(content=None, embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
+    
+    async def lang_callback(self, interaction: discord.Interaction):
+        # 切換語言並顯示首頁
+        self.lang = "zh" if self.lang == "en" else "en"
+        self._build_buttons()
+        header = CONTENT[self.lang]["header"]
+        await interaction.response.edit_message(content=header, embed=None, view=self)
+
+
+# 公共訊息按鈕視圖（閱讀按鈕 + 語言切換）
+class PublicNavigationView(discord.ui.View):
+    def __init__(self, lang: str = "en"):
+        super().__init__(timeout=None)
+        self.lang = lang
+        self._build_buttons()
+    
+    def _build_buttons(self):
+        """建立公共按鈕"""
+        self.clear_items()
+        labels = BUTTON_LABELS[self.lang]
+        
+        # 閱讀按鈕（藍色）
+        btn_read = discord.ui.Button(
+            label="Read" if self.lang == "en" else "\u95b1\u8b80",
+            style=discord.ButtonStyle.primary, 
+            emoji="\U0001F4D6",  # 📖
+            custom_id=f"public_read_{self.lang}"
+        )
+        btn_read.callback = self.read_callback
+        self.add_item(btn_read)
+        
+        # 語言切換按鈕（藍色）
+        btn_lang = discord.ui.Button(
+            label=labels["lang_switch"], 
+            style=discord.ButtonStyle.primary, 
+            emoji=labels["lang_emoji"],
+            custom_id=f"public_lang_{self.lang}"
+        )
+        btn_lang.callback = self.lang_callback
+        self.add_item(btn_lang)
+    
+    async def read_callback(self, interaction: discord.Interaction):
+        """點擊閱讀按鈕，發送私人訊息"""
+        embed = get_embed_content("vision_value", self.lang)
+        await interaction.response.send_message(
+            embed=embed, 
+            view=PrivateNavigationView(self.lang),
+            ephemeral=True
+        )
     
     async def lang_callback(self, interaction: discord.Interaction):
         # 切換語言
         self.lang = "zh" if self.lang == "en" else "en"
         self._build_buttons()
+        await interaction.response.edit_message(
+            embed=get_public_embed(self.lang), 
+            view=self
+        )
+
+
+# 伺服器規則視圖（含語言切換）
+class RulesView(discord.ui.View):
+    def __init__(self, lang: str = "en"):
+        super().__init__(timeout=None)
+        self.lang = lang
+        self._build_buttons()
+    
+    def _build_buttons(self):
+        """建立語言切換按鈕"""
+        self.clear_items()
+        labels = BUTTON_LABELS[self.lang]
         
-        # 更新訊息
-        header = CONTENT[self.lang]["header"]
-        await interaction.response.edit_message(content=header, embed=None, view=self)
+        # 語言切換按鈕
+        btn_lang = discord.ui.Button(
+            label=labels["lang_switch"], 
+            style=discord.ButtonStyle.primary, 
+            emoji=labels["lang_emoji"],
+            custom_id=f"rules_lang_{self.lang}"
+        )
+        btn_lang.callback = self.lang_callback
+        self.add_item(btn_lang)
+    
+    async def lang_callback(self, interaction: discord.Interaction):
+        # 切換語言
+        self.lang = "zh" if self.lang == "en" else "en"
+        self._build_buttons()
+        await interaction.response.edit_message(
+            embed=get_rules_embed(self.lang), 
+            view=self
+        )
 
 
 # 2. 註冊斜線指令
 @tree.command(name="mindmap", description="開啟 Bearth 資訊導覽")
 async def mindmap(interaction: discord.Interaction):
     await interaction.response.send_message(
-        content=CONTENT["en"]["header"],
-        view=NavigationView("en")
+        embed=get_public_embed("en"),
+        view=PublicNavigationView("en")
+    )
+
+
+@tree.command(name="rules", description="顯示伺服器規則 / Show server rules")
+async def rules(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        embed=get_rules_embed("en"),
+        view=RulesView("en")
     )
 
 
 # 3. 機器人啟動時執行
+# Guild ID for immediate command sync (測試用伺服器)
+TEST_GUILD = discord.Object(id=1394953618779672607)
+
 @client.event
 async def on_ready():
     print(f"目前登入身份 --> {client.user}")
+    # 同步到指定伺服器（即時生效）
+    await tree.sync(guild=TEST_GUILD)
+    print("指令已同步到測試伺服器！")
+    # 也同步全域指令（需等待最多1小時）
     await tree.sync()
-    print("指令已同步！")
+    print("全域指令已同步！")
 
 
 # 4. 啟動機器人
