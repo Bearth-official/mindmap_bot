@@ -1,0 +1,329 @@
+# Bearth Discord Bot - Python Version
+# 執行指令： python bearth_bot.py
+# 如果出現 ModuleNotFoundError，請先執行： pip install discord.py
+
+import discord
+from discord import app_commands
+import os
+
+# 1. 建立 Client 實體
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
+
+# 按鈕標籤的多語言版本
+BUTTON_LABELS = {
+    "en": {
+        "vision_value": "Vision & Value",
+        "community": "Community",
+        "expansion": "Expansion",
+        "digital": "Digital",
+        "physical": "Physical",
+        "hybrid": "Hybrid",
+        "lang_switch": "中文",
+        "lang_emoji": "🇹🇼",
+    },
+    "zh": {
+        "vision_value": "願景與價值",
+        "community": "社群",
+        "expansion": "擴展",
+        "digital": "數位",
+        "physical": "實體",
+        "hybrid": "混合",
+        "lang_switch": "English",
+        "lang_emoji": "🇺🇸",
+    }
+}
+
+# 多語言內容資料
+CONTENT = {
+    "en": {
+        "header": "**🐻 Bearth Info Center**\nClick the buttons below to explore our universe:",
+        "vision_value": {
+            "title": "✨ Vision & Value",
+            "fields": [
+                ("👁️ Our Vision", "Create a healing universe where loss transforms into creation, and every being finds their place among the stars."),
+                ("💎 Our Values", "The Bearth universe is guided by a core set of values, rooted in the story of the Bear Tribe:"),
+                ("🌱 Sustainability in action", "Sustainability isn't just a slogan—it's a commitment woven into every decision. From eco-friendly materials to responsible production, our actions speak louder than words."),
+                ("❤️ Healing First", "Bearth began with a story of loss and rebirth. We believe art and creation can heal hearts, allowing precious memories to live on in new forms."),
+                ("🐻 Coexistence over competition", "Like the Bear Tribe's laid-back philosophy, we believe the best future isn't about fighting for space, but finding a planet where everyone can rest comfortably."),
+                ("🏗️ Thoughtfully Crafted", "Inspired by architectural thinking, every detail of Bearth is designed with careful consideration. We pursue meaning, not speed."),
+            ]
+        },
+        "community": {
+            "title": "🤝 Community",
+            "fields": [
+                ("🌍 Community", "We are travelers of the universe, navigating between loss and creation, solitude and belonging. We influence web3 culture through warmth, not noise."),
+                ("🚀 Creator Empowerment", "We empower creators from within, building infrastructure that helps artists, storytellers, musicians, and dreamers of all kinds rise and thrive."),
+                ("⚖️ Value Alignment", "Our community supports healing, coexistence, and intentional creation. We lead and support movements that share our vision, building a kinder, more thoughtful web3."),
+                ("🌱 Growing Together", "We're recruiting global ambassadors and establishing governance structures that let the community shape Bearth's future. But we won't rush—we trust the process."),
+                ("🏛️ Decentralized Governance (DAO)", "As our community matures, we're moving toward a DAO structure, enabling holders to shape Bearth's future through collective decision-making."),
+            ]
+        },
+        "expansion": {
+            "title": "📈 Expansion",
+            "fields": [
+                ("⏳ Organic Growth", "Growth isn't about rushing—it's about finding the right rhythm. Just as the Fibonacci sequence guides our minting phases, Bearth expands organically, one thoughtful step at a time."),
+                ("🖼️ NFT Collection (In Progress)", "The first entry into the Bearth universe is through our genesis NFT collection. These 9,999 digital collectibles serve as your identity and key within our world. The collection will be released in seven phases, following the Fibonacci sequence: 303, 303, 606, 909, 1515, 2424, 3939."),
+                ("🤝 Partnerships (In Progress)", "We're exploring collaborations with artists, brands, and projects that share our values, helping us reach new audiences while staying true to our mission."),
+                ("🌟 Ambassador Program (Exploring)", "Ambassadors are co-creators and community builders who help Bearth find home worldwide. We're seeking:\n\n• **Community Builders** - Organize local meet-ups and gatherings\n• **Story Tellers** - Create content and share personal journeys\n• **Brand Advocates** - Represent Bearth authentically on social media"),
+            ]
+        },
+        "digital": {
+            "title": "💻 Digital",
+            "fields": [
+                ("🌐 The Digital Realm", "The digital realm is the native home of the Bearth IP, where our community gathers and the world comes to life."),
+                ("🏙️ The City (In Progress)", "A web-based metaverse, similar to Azuki's Hilumia platform, that will become our community's digital home."),
+                ("🐻 3D Characters (Exploring)", "We'll create 3D versions of every bear following OTHERSIDE specifications. Your bear is a traveler, free to explore anywhere on the journey, just like you."),
+                ("🎮 Digital Experiences (Exploring)", "We're exploring interactive experiences, mini-games, and storytelling formats that make the digital universe feel alive."),
+            ]
+        },
+        "physical": {
+            "title": "🧸 Physical",
+            "fields": [
+                ("📦 The Physical World", "The Bearth IP extends into the physical world, bringing the universe to life in your hands. These products are tangible extensions of our story, not just merchandise."),
+                ("🎨 Toys & Collectibles (Exploring)", "We're creating high-quality Bear Tribe toys and collectibles that bring joy and comfort. These aren't just merchandise—they're companions that make the universe tangible."),
+                ("♻️ Sustainable Production (Exploring)", "Every product uses eco-friendly materials and ethical manufacturing. Our values aren't just digital."),
+                ("👕 Apparel (Exploring)", "We're exploring clothing that brings Bearth into everyday life."),
+                ("🖼️ Others (Exploring)", "We're exploring art prints, home goods, and other merchandise that bring Bearth into daily life."),
+            ]
+        },
+        "hybrid": {
+            "title": "🔗 Hybrid",
+            "fields": [
+                ("⚡ Phygital Fusion", "At the heart of the Bearth IP is the fusion of physical and digital experiences. We experiment with new media and interactive formats that blur the boundaries, creating a truly immersive universe."),
+                ("📖 Interactive Storytelling (Exploring)", "Imagine RPG games where the community shapes the storyline, or animated shorts where your Bear plays a role."),
+                ("🤳 Phygital Technology (Exploring)", "We're creating products that seamlessly blend physical and digital, collectibles that exist in both worlds and unlock experiences in each."),
+                ("💼 IP Licensing & Monetization (Exploring)", "Enabling holders to license their NFTs to brands, transforming digital ownership into real commercial value and revenue."),
+            ]
+        },
+    },
+    "zh": {
+        "header": "**🐻 Bearth 資訊導覽中心**\n請點擊下方按鈕探索我們的宇宙：",
+        "vision_value": {
+            "title": "✨ 願景與價值",
+            "fields": [
+                ("👁️ 我們的願景", "創造一個療癒的宇宙，讓失去轉化為創造，讓每個生命都能在星空中找到歸屬。"),
+                ("💎 我們的價值觀", "Bearth 宇宙由一套核心價值觀引導，根植於熊族的故事："),
+                ("🌱 永續行動", "永續不只是口號——它是融入每個決策的承諾。從環保材料到負責任的生產，我們的行動勝於言語。"),
+                ("❤️ 療癒優先", "Bearth 始於一個關於失去與重生的故事。我們相信藝術和創作能療癒心靈，讓珍貴的回憶以新的形式延續。"),
+                ("🐻 共存勝於競爭", "如同熊族悠閒的哲學，我們相信最好的未來不是爭奪空間，而是找到一個每個人都能舒適休息的星球。"),
+                ("🏗️ 用心打造", "受建築思維啟發，Bearth 的每個細節都經過深思熟慮。我們追求意義，而非速度。"),
+            ]
+        },
+        "community": {
+            "title": "🤝 社群",
+            "fields": [
+                ("🌍 社群", "我們是宇宙的旅人，在失去與創造、孤獨與歸屬之間航行。我們用溫暖而非喧囂來影響 web3 文化。"),
+                ("🚀 創作者賦能", "我們從內部賦能創作者，建立基礎設施幫助藝術家、故事講述者、音樂家和各類夢想家崛起並蓬勃發展。"),
+                ("⚖️ 價值一致", "我們的社群支持療癒、共存和有意識的創作。我們領導並支持與我們願景相同的運動，建立一個更友善、更有思想的 web3。"),
+                ("🌱 共同成長", "我們正在招募全球大使，並建立治理結構，讓社群塑造 Bearth 的未來。但我們不會急躁——我們相信過程。"),
+                ("🏛️ 去中心化治理 (DAO)", "隨著社群成熟，我們正朝向 DAO 結構發展，讓持有者透過集體決策來塑造 Bearth 的未來。"),
+            ]
+        },
+        "expansion": {
+            "title": "📈 擴展",
+            "fields": [
+                ("⏳ 有機成長", "成長不是急躁——而是找到正確的節奏。正如費波那契數列引導我們的鑄造階段，Bearth 有機地擴展，一次一個深思熟慮的步驟。"),
+                ("🖼️ NFT 收藏系列（進行中）", "進入 Bearth 宇宙的第一步是透過我們的創世 NFT 收藏。這 9,999 個數位收藏品是你在我們世界中的身份和鑰匙。收藏將分七個階段發布，遵循費波那契數列：303, 303, 606, 909, 1515, 2424, 3939。"),
+                ("🤝 合作夥伴（進行中）", "我們正在探索與分享我們價值觀的藝術家、品牌和專案的合作，幫助我們觸及新受眾，同時保持對使命的忠誠。"),
+                ("🌟 大使計劃（探索中）", "大使是共同創作者和社群建設者，幫助 Bearth 在全球找到家園。我們正在尋找：\n\n• **社群建設者** - 組織本地聚會和活動\n• **故事講述者** - 創作內容並分享個人旅程\n• **品牌倡導者** - 在社交媒體上真實地代表 Bearth"),
+            ]
+        },
+        "digital": {
+            "title": "💻 數位",
+            "fields": [
+                ("🌐 數位領域", "數位領域是 Bearth IP 的原生家園，社群在此聚集，世界在此活起來。"),
+                ("🏙️ 城市（進行中）", "一個基於網頁的元宇宙，類似 Azuki 的 Hilumia 平台，將成為我們社群的數位家園。"),
+                ("🐻 3D 角色（探索中）", "我們將依照 OTHERSIDE 規格創建每隻熊的 3D 版本。你的熊是旅行者，可以自由探索旅途中的任何地方，就像你一樣。"),
+                ("🎮 數位體驗（探索中）", "我們正在探索互動體驗、小遊戲和故事格式，讓數位宇宙充滿生命力。"),
+            ]
+        },
+        "physical": {
+            "title": "🧸 實體",
+            "fields": [
+                ("📦 實體世界", "Bearth IP 延伸到實體世界，將宇宙帶到你手中。這些產品是我們故事的有形延伸，而不只是商品。"),
+                ("🎨 玩具與收藏品（探索中）", "我們正在創造高品質的熊族玩具和收藏品，帶來歡樂與慰藉。這些不只是商品——它們是讓宇宙變得有形的夥伴。"),
+                ("♻️ 永續生產（探索中）", "每個產品都使用環保材料和道德製造。我們的價值觀不只存在於數位世界。"),
+                ("👕 服飾（探索中）", "我們正在探索將 Bearth 帶入日常生活的服飾。"),
+                ("🖼️ 其他（探索中）", "我們正在探索藝術印刷品、家居用品和其他將 Bearth 帶入日常生活的商品。"),
+            ]
+        },
+        "hybrid": {
+            "title": "🔗 混合",
+            "fields": [
+                ("⚡ 虛實融合", "Bearth IP 的核心是實體與數位體驗的融合。我們嘗試新媒體和互動格式，模糊界限，創造真正沉浸式的宇宙。"),
+                ("📖 互動故事（探索中）", "想像一下 RPG 遊戲，社群塑造故事線，或者你的熊在動畫短片中扮演角色。"),
+                ("🤳 虛實技術（探索中）", "我們正在創造無縫融合實體與數位的產品，存在於兩個世界的收藏品，在每個世界解鎖體驗。"),
+                ("💼 IP 授權與變現（探索中）", "讓持有者能夠將他們的 NFT 授權給品牌，將數位所有權轉化為真正的商業價值和收入。"),
+            ]
+        },
+    }
+}
+
+
+def get_embed_content(embed_type: str, lang: str = "en") -> discord.Embed:
+    """根據類型和語言返回對應的 Embed"""
+    content = CONTENT[lang][embed_type]
+    embed = discord.Embed(title=content["title"], color=0x9b59b6)
+    
+    for name, value in content["fields"]:
+        embed.add_field(name=name, value=value, inline=False)
+    
+    return embed
+
+
+# 定義按鈕視圖（使用動態按鈕）
+class NavigationView(discord.ui.View):
+    def __init__(self, lang: str = "en"):
+        super().__init__(timeout=None)
+        self.lang = lang
+        self._build_buttons()
+    
+    def _build_buttons(self):
+        """根據語言建立按鈕"""
+        # 清除所有現有按鈕
+        self.clear_items()
+        
+        labels = BUTTON_LABELS[self.lang]
+        
+        # 第一排按鈕
+        btn_vision = discord.ui.Button(
+            label=labels["vision_value"], 
+            style=discord.ButtonStyle.primary, 
+            emoji="✨", 
+            custom_id="btn_vision_value", 
+            row=0
+        )
+        btn_vision.callback = self.vision_value_callback
+        self.add_item(btn_vision)
+        
+        btn_community = discord.ui.Button(
+            label=labels["community"], 
+            style=discord.ButtonStyle.success, 
+            emoji="🤝", 
+            custom_id="btn_community", 
+            row=0
+        )
+        btn_community.callback = self.community_callback
+        self.add_item(btn_community)
+        
+        btn_expansion = discord.ui.Button(
+            label=labels["expansion"], 
+            style=discord.ButtonStyle.secondary, 
+            emoji="📈", 
+            custom_id="btn_expansion", 
+            row=0
+        )
+        btn_expansion.callback = self.expansion_callback
+        self.add_item(btn_expansion)
+        
+        # 第二排按鈕
+        btn_digital = discord.ui.Button(
+            label=labels["digital"], 
+            style=discord.ButtonStyle.success, 
+            emoji="💻", 
+            custom_id="btn_digital", 
+            row=1
+        )
+        btn_digital.callback = self.digital_callback
+        self.add_item(btn_digital)
+        
+        btn_physical = discord.ui.Button(
+            label=labels["physical"], 
+            style=discord.ButtonStyle.secondary, 
+            emoji="🧸", 
+            custom_id="btn_physical", 
+            row=1
+        )
+        btn_physical.callback = self.physical_callback
+        self.add_item(btn_physical)
+        
+        btn_hybrid = discord.ui.Button(
+            label=labels["hybrid"], 
+            style=discord.ButtonStyle.danger, 
+            emoji="🔗", 
+            custom_id="btn_hybrid", 
+            row=1
+        )
+        btn_hybrid.callback = self.hybrid_callback
+        self.add_item(btn_hybrid)
+        
+        # 第三排：語言切換按鈕
+        btn_lang = discord.ui.Button(
+            label=labels["lang_switch"], 
+            style=discord.ButtonStyle.secondary, 
+            emoji=labels["lang_emoji"], 
+            custom_id="btn_lang", 
+            row=2
+        )
+        btn_lang.callback = self.lang_callback
+        self.add_item(btn_lang)
+    
+    async def vision_value_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("vision_value", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def community_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("community", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def expansion_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("expansion", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def digital_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("digital", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def physical_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("physical", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def hybrid_callback(self, interaction: discord.Interaction):
+        embed = get_embed_content("hybrid", self.lang)
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+    
+    async def lang_callback(self, interaction: discord.Interaction):
+        # 切換語言
+        self.lang = "zh" if self.lang == "en" else "en"
+        self._build_buttons()
+        
+        # 更新訊息
+        header = CONTENT[self.lang]["header"]
+        await interaction.response.edit_message(content=header, embed=None, view=self)
+
+
+# 2. 註冊斜線指令
+@tree.command(name="mindmap", description="開啟 Bearth 資訊導覽")
+async def mindmap(interaction: discord.Interaction):
+    await interaction.response.send_message(
+        content=CONTENT["en"]["header"],
+        view=NavigationView("en")
+    )
+
+
+# 3. 機器人啟動時執行
+@client.event
+async def on_ready():
+    print(f"目前登入身份 --> {client.user}")
+    await tree.sync()
+    print("指令已同步！")
+
+
+# 4. 啟動機器人
+if __name__ == "__main__":
+    # 從環境變數讀取 Token（安全做法）
+    TOKEN = os.environ.get("DISCORD_TOKEN")
+    
+    if not TOKEN:
+        print("錯誤：請設定 DISCORD_TOKEN 環境變數")
+        print("在 Render 上，請到 Environment 設定中加入 DISCORD_TOKEN")
+        exit(1)
+    
+    # 啟動 keep_alive HTTP 服務（用於 Render 免費方案）
+    from keep_alive import keep_alive
+    keep_alive()
+    print("Keep-alive 服務已啟動在 port 8080")
+    
+    client.run(TOKEN)
